@@ -1,6 +1,7 @@
 from nextcord.ext import commands, tasks
 from datetime import datetime, timezone, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson.objectid import ObjectId
 
 from dotenv import load_dotenv
 import os
@@ -21,18 +22,23 @@ class ResetDatesHandler(commands.Cog):
         return datetime_object.strftime("%S:%M:%H:%d:%m:%Y:%z")
 
     @tasks.loop(minutes=1)
-    async def reset_weekly(self):
+    async def update_reset_dates(self):
         now = await self._now()
-        last_restart_document = await restart_date_db.find_one({"type": "weekly"})
-        last_restart_date = datetime.strptime(last_restart_document["last_restart"], "%S:%M:%H:%d:%m:%Y:%z")
-        next_reset_date = (last_restart_date + timedelta(days=7))
-        if now > next_reset_date:
-            next_restart_date_string = await self.datetime_to_string(next_reset_date)
+        last_restart_document = await restart_date_db.find_one({"_id": ObjectId("62b4546da162f9c1a2fbdfe8")})
+        last_weekly_restart_date = datetime.strptime(last_restart_document["last_weekly_restart"], "%S:%M:%H:%d:%m:%Y:%z")
+        next_weekly_reset_date = (last_weekly_restart_date + timedelta(days=7))
+        last_restart_month = last_restart_document["last_restart_month"]
+
+        if now > next_weekly_reset_date:
+            next_restart_date_string = await self.datetime_to_string(next_weekly_reset_date)
             await restart_date_db.update_one(last_restart_document, {"$set": {"last_restart": next_restart_date_string}})
+
+        if now.month > last_restart_month:
+            await restart_date_db.update_one(last_restart_document, {"$set": {"last_restart_month": now.month}})
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.reset_weekly.start()
+        self.update_reset_dates.start()
 
 def setup(client):
     client.add_cog(ResetDatesHandler(client))

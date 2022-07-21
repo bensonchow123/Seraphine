@@ -249,14 +249,7 @@ class ChatFilter(commands.Cog):
                     after.delete(),
                 )
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        print(error)
-        if isinstance(error, commands.CommandNotFound):
-            await ctx.send(
-                "**Unknown command, do`!help` to get list of all commands**",
-                delete_after=15,
-            )
+
 
     @commands.Cog.listener()
     async def on_ready(self):

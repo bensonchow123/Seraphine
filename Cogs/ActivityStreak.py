@@ -93,14 +93,14 @@ class ActivityStreak(commands.Cog):
                 )
         else:
             current_streak = 1
-            reason = f"{message.author.mention.display_name} has begun a new activity streak!!!  [See Message]({message.jump_url})"
+            reason = f"{message.author.display_name} has begun a new activity streak!!!  [See Message]({message.jump_url})"
             await self.update_database(message.author, "current_streak", current_streak)
 
         if current_streak > best_streak:
             await self.update_database(message.author, "best_streak", current_streak)
         await self.update_database(message.author, "last_active_date", await self._now())
         await self.skybies._give_skybies(message.author, skybies, reason)
-        await message.channel.send(notification, delete_after=10)
+        await message.reply(notification, delete_after=15, mention_author=False)
 
     @commands.Cog.listener()
     async def on_ready(self):

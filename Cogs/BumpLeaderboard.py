@@ -1,5 +1,5 @@
 import os
-
+from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import DESCENDING
 from nextcord import Embed, utils
@@ -17,8 +17,8 @@ class Bumpleaderboard(commands.Cog):
 
 
     async def _find_weekly_restart_date(self):
-        last_restart = await restart_date_db.find_one({"type": "weekly"})
-        last_restart = last_restart["last_restart"]
+        last_restart = await restart_date_db.find_one({"_id": ObjectId("62b4546da162f9c1a2fbdfe8")})
+        last_restart = last_restart["last_weekly_restart"]
         last_restart_date = datetime.strptime(last_restart, "%S:%M:%H:%d:%m:%Y:%z")
         return last_restart_date
 

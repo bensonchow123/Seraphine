@@ -9,7 +9,7 @@ from Utilities.PerspectiveApi import perspective_api
 load_dotenv()
 
 
-class Ai(commands.Cog):
+class Seraphine(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -114,4 +114,4 @@ class Ai(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(Ai(client))
+    client.add_cog(Seraphine(client))

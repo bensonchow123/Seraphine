@@ -124,7 +124,10 @@ class SelfPromotion(commands.Cog):
             description=f"In order to send ads in this channel, you will need some darkweb connections from Seraphine.\n"
                         f"Do `!skybies shop` to purchase the {self.sky_promoter.mention} role,\n"
                         f"to signify yourself as a friend of Seraphine, escaping from "
-                        f"all ad blocker ban lists.",
+                        f"all ad blocker ban lists.\n\n"
+                        f"You will also need to pay for ad space with skybies, which increases as you send more ads, "
+                        f"though it resets every week 😎",
+
             colour=0x97BC62
         ).set_thumbnail(
             url="https://cdn.discordapp.com/attachments/850019796014858280/992247149767164026/promotion.png"
@@ -132,7 +135,8 @@ class SelfPromotion(commands.Cog):
         await self.self_promotion_channel.send(embed=explanation_embed)
 
     async def _find_weekly_restart_date(self):
-        last_restart = await restart_date_db.find_one({"type": "weekly"})["last_restart"]
+        last_restart = await restart_date_db.find_one({"type": "weekly"})
+        last_restart = last_restart["last_restart"]
         last_restart_date = datetime.strptime(last_restart, "%S:%M:%H:%d:%m:%Y:%z")
         return last_restart_date
 

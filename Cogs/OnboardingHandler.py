@@ -36,14 +36,17 @@ class Onboarding(commands.Cog):
 
         if message.author.id == self.memberid:
             return
+
         usernames = []
         for x in self.unwelcomedids:
             member = self.guild.get_member(x)
             usernames.append(member.mention if member else "Unknown")
         await self.skybies._give_skybies(message.author, 1, f"{message.author.display_name} had welcomed {','.join(usernames)} to Skyhub!!!")
-        await message.channel.send(
-            f"{message.author.mention} you have been given 1 skybie for welcoming {len(usernames)} member",
-            delete_after=7)
+        await message.reply(
+            f"{message.author.display_name} have been given 1 skybie for welcoming {len(usernames)} member",
+            delete_after=7,
+            mention_author=False
+        )
         self.unwelcomedids.clear()
 
     @commands.Cog.listener("on_member_join")
