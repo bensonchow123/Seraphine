@@ -192,15 +192,10 @@ class HonorSystem(commands.Cog):
             honor_insert_id = await self._log_honor(ctx, giftee, honor_type, reason)
             honor_threshold_role, skybie_given = await self.honor_rewards(giftee, honor_type)
             description = f"🎉 You have given a {honor_type} honor to {giftee.display_name}"
-            how_to_delete = None
             if honor_threshold_role:
                 description += (
                     f" and they unlocked the {honor_threshold_role.mention}"
                     f" role with a reward of {skybie_given} skybies 🌟"
-                )
-                how_to_delete = (
-                    f"As this is a honor threshold honor, to delete this, ",
-                    f"please do \n`!honor remove {honor_insert_id} {honor_threshold_role.mention}`"
                 )
 
             await self._honor_status_embed(
@@ -209,7 +204,7 @@ class HonorSystem(commands.Cog):
                 True,
                 giftee
             )
-            await self._honor_staff_logging_embed(ctx, giftee, honor_type, reason, honor_insert_id, how_to_delete)
+            await self._honor_staff_logging_embed(ctx, giftee, honor_type, reason, honor_insert_id)
 
     @commands.group(aliases=["h", "rep", "r", 'honour'], invoke_without_command=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
@@ -253,17 +248,26 @@ class HonorSystem(commands.Cog):
 
     @honor.error
     async def honor_error(self, ctx, error):
+        print("honor error", error)
         if isinstance(error, commands.MissingRequiredArgument):
+            self.honor.reset_cooldown(ctx)
             await self._honor_status_embed(
                 ctx,
-                f"🛑 Missing required argument: `({error.param.name})`"
-                f"Use: `!honor (@member or id) (reason)`",
+                f"🛑 Missing required argument: `{error.param.name}`\n"
+                f"Use: `!honor (@giftee or giftee id) (reason)`",
                 False,
             )
         elif isinstance(error, commands.CommandOnCooldown):
             await self._honor_status_embed(
                 ctx,
                 f"🛑 Please wait {error.retry_after:.0f} seconds, as there is a cooldown of 30 seconds for each honor",
+                False,
+            )
+        elif isinstance(error, commands.MemberNotFound):
+            await self._honor_status_embed(
+                ctx,
+                f"🛑 Member not found or honor command dont exist\n"
+                f"Use: `!honor (@giftee or giftee id) (reason) or !help honor`",
                 False,
             )
 
@@ -503,15 +507,16 @@ class HonorSystem(commands.Cog):
                 honor_threshold_role,
                 honor_type
             )
-            description = f"""🛑 You have removed a threshold honor, {giftee.mention}'s threshold reward
-                          ({honor_threshold_role.mention} role and {skybies_to_remove} skybies) is removed."""
+            description = f"""🛑 You have removed a threshold honor.\n{giftee.mention}'s threshold reward
+                          `({honor_threshold_role.mention} role and {skybies_to_remove} skybies)` is removed."""
 
             if previous_role:
                 await giftee.add_roles(previous_role)
-                description += f"\nTheir previous role {previous_role.mention} is added back."
+                description += f"\nTheir previous role `{previous_role.mention}` is added back."
             await self.skybies._take_skybies(giftee, skybies_to_remove)
             await giftee.remove_roles(honor_threshold_role)
 
+        await honor_system_db.delete_one(honor_to_delete)
         await self._honor_status_embed(
             ctx,
             description,
@@ -538,7 +543,6 @@ class HonorSystem(commands.Cog):
     @commands.is_owner()
     async def honor_test(self, ctx, count: int, giftee: Member):
         for i in range(count):
-            await self._log_honor(ctx, giftee, "dungeon", "tesing this good")
             honor_insert_id = await self._log_honor(ctx, giftee, "dungeon", "tesing this good")
             honor_threshold_role, skybie_given = await self.honor_rewards(giftee, "dungeon")
             description = f"🎉 You have given a {'dungeon'} honor to {giftee.display_name}"
