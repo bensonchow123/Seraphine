@@ -115,7 +115,15 @@ class BumpReminder(commands.Cog):
             if self.bump_king_role in member.roles:
                 return member
 
-    async def _crown_bump_king(self,member):
+    async def _remove_all_crowining_message(self):
+        bump_channel_messages = await self.bump_channel.history(limit=500).flatten()
+        for message in bump_channel_messages:
+            if message.author.id == self.client.user.id and message.embeds:
+                if "👑 All Hail The Bump King 👊" in message.embeds[0].title.casefold():
+                    await message.delete()
+
+    async def _crown_bump_king(self, member):
+        await self._remove_all_crowining_message()
         crowing_embed = Embed(
             color=0xFFCC00,
             title="👑 All Hail The Bump King 👊",

@@ -93,6 +93,9 @@ class HonorSystem(commands.Cog):
     async def _string_to_datetime(self, string):
         return datetime.strptime(string, "%S:%M:%H:%d:%m:%Y:%z")
 
+    async def pural(self, num):
+        return "s" if num > 1 else ""
+
     async def _log_honor(self, ctx, giftee, honor_type, reason):
         now = await self._now()
         insert = await honor_system_db.insert_one(
@@ -210,7 +213,7 @@ class HonorSystem(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def honor(self, ctx, giftee: Member, *, reason: str):
         if ctx.invoked_subcommand is None:
-            if ctx.channel.id not in [self.trading_honor_commands.id, self.dungeon_honor_commands.id]:
+            if ctx.channel.id not in self.honor_command_channels:
                 await ctx.send(
                     f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}"
                 )
@@ -248,7 +251,6 @@ class HonorSystem(commands.Cog):
 
     @honor.error
     async def honor_error(self, ctx, error):
-        print("honor error", error)
         if isinstance(error, commands.MissingRequiredArgument):
             self.honor.reset_cooldown(ctx)
             await self._honor_status_embed(
@@ -267,16 +269,29 @@ class HonorSystem(commands.Cog):
             await self._honor_status_embed(
                 ctx,
                 f"🛑 Member not found or honor command dont exist\n"
-                f"Use: `!honor (@giftee or giftee id) (reason) or !help honor`",
+                f"Use: `!honor (@giftee or giftee id) (reason)` or `!help honor`",
                 False,
             )
 
     @honor.command(name="stats", aliases=["s"])
     async def honor_stats(self, ctx, member: Member = None):
+        if ctx.channel not in self.honor_command_channels and not ctx.author.guild_permissions.manage_messages:
+            await ctx.send(
+                f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}"
+            )
+            return
+
         you = 'they'
         if not member:
             member = ctx.author
             you = 'you'
+        if member.bot:
+            await self._honor_status_embed(
+                ctx,
+                "🛑 Bot have infinite honor, statistics cannot be determined for infinity",
+                False,
+            )
+            return
         total_honor = await honor_system_db.count_documents({"honor_giftee_id": member.id})
         if not total_honor:
             await self._honor_status_embed(
@@ -285,11 +300,24 @@ class HonorSystem(commands.Cog):
                 False,
             )
             return
+        member_honor_cursor = honor_system_db.find({"honor_giftee_id": member.id})
+        dungeon_honor, trading_honor, today_honor, last_7_days_honor, gifter_id_list = 0, 0, 0, 0, []
+        async for insert in member_honor_cursor:
+            gifter_id_list.append(insert['honor_giver_id'])
+            if insert['honor_type'] == 'dungeon':
+                dungeon_honor += 1
+            else:
+                trading_honor += 1
+            insert_date = await self._string_to_datetime(insert['date'])
+            now = await self._now()
+            if insert_date >= (now - timedelta(days=7)):
+                last_7_days_honor += 1
+            if insert_date >= (now - timedelta(days=1)):
+                today_honor += 1
 
-        dungeon_honor = await honor_system_db.count_documents({"honor_giftee_id": member.id, "honor_type": "dungeon"})
-        trading_honor = await honor_system_db.count_documents({"honor_giftee_id": member.id, "honor_type": "trading"})
         trading_embed_field_value = f"***{you.capitalize()} have {trading_honor} trading honor.***"
         dungeon_embed_field_value = f"***{you.capitalize()} have {dungeon_honor} dungeon honor.***"
+
         trading_honor_away = f"{you.capitalize()} have the maxed trading honor role"
         for key, value in self.honor_threshold_roles["trading"].items():
             if trading_honor < key:
@@ -310,7 +338,7 @@ class HonorSystem(commands.Cog):
 
         honor_stats_embed = Embed(
             title=f"{member.display_name}'s honor stats",
-            description=f"{you.capitalize()} have {total_honor} total honor",
+            description=f"{you.capitalize()} have **{total_honor}** total honor",
             colour=0x003697
         ).add_field(
             name="Trading honor",
@@ -320,7 +348,17 @@ class HonorSystem(commands.Cog):
             name="Dungeon honor",
             value=dungeon_embed_field_value,
             inline=False
+        ).add_field(
+            name="From last 24 hours",
+            value=today_honor
+        ).add_field(
+            name="From last 7 days",
+            value=last_7_days_honor
+        ).add_field(
+            name="Unique gifters %",
+            value=f"{round((len(gifter_id_list)-len(set(gifter_id_list))) / len(gifter_id_list) * 100, 2)} %"
         )
+
         await ctx.reply(embed=honor_stats_embed, mention_author=False)
 
     async def _sort_honor(self, honor_type):
@@ -363,10 +401,9 @@ class HonorSystem(commands.Cog):
 
     @honor.command(name="leaderboard", aliases=["l"])
     async def honor_leaderboard(self, ctx, member: Member = None):
-        if ctx.channel.id not in [self.trading_honor_commands.id, self.dungeon_honor_commands.id]:
+        if ctx.channel not in self.honor_command_channels and not ctx.author.guild_permissions.manage_messages:
             await ctx.send(
-                f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}",
-                delete_after=10
+                f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}"
             )
             return
 
@@ -393,10 +430,9 @@ class HonorSystem(commands.Cog):
 
     @honor.command(name="history", aliases=["h"])
     async def honor_history(self, ctx, member: Member = None):
-        if ctx.channel.id not in [self.trading_honor_commands.id, self.dungeon_honor_commands.id]:
+        if ctx.channel not in self.honor_command_channels and not ctx.author.guild_permissions.manage_messages:
             await ctx.send(
-                f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}",
-                delete_after=10
+                f"You can only use this command in {self.trading_honor_commands.mention} or {self.dungeon_honor_commands.mention}"
             )
             return
 
@@ -420,18 +456,23 @@ class HonorSystem(commands.Cog):
         async for insert in member_honor_cursor:
             insert_date = await self._string_to_datetime(insert["date"])
             ago = now - insert_date
-            ago_message = f"{ago.seconds} seconds ago"
+            seconds_difference = ago.seconds
+            ago_message = f"{seconds_difference} second{await self.pural(seconds_difference)} ago"
             if ago.days >= 365:
-                ago_message = f"{now.year - insert_date.year} year ago"
+                years_difference = now.year - insert_date.year
+                ago_message = f"{years_difference} year{await self.pural(years_difference)} ago"
             elif now.month != insert_date.month:
                 months_difference = (now.year - insert_date.year) * 12 + now.month - insert_date.month
-                ago_message = f"{months_difference} month ago"
+                ago_message = f"{months_difference} month{await self.pural(months_difference)} ago"
             elif ago.days > 0:
-                ago_message = f"{ago.days} day ago"
+                days_difference = ago.days
+                ago_message = f"{days_difference} day{await self.pural(days_difference)} ago"
             elif ago.seconds >= 3600:
-                ago_message = f"{ago.seconds // 3600} hour ago"
+                hours_difference = ago.seconds // 3600
+                ago_message = f"{hours_difference} hour{await self.pural(hours_difference)} ago"
             elif ago.seconds >= 60:
-                ago_message = f"{ago.seconds // 60} minute ago"
+                minutes_difference = ago.seconds // 60
+                ago_message = f"{minutes_difference} minute{await self.pural(minutes_difference)} ago"
             elif ago.seconds <= 0:
                 ago_message = "just now"
 
@@ -565,6 +606,7 @@ class HonorSystem(commands.Cog):
         self.guild = self.client.get_guild(844231449014960160)
         self.dungeon_honor_commands = utils.get(self.guild.text_channels, name="🏅dungeon-honor-commands")
         self.trading_honor_commands = utils.get(self.guild.text_channels, name="🏅trading-honor-commands")
+        self.honor_command_channels = [self.trading_honor_commands.id, self.dungeon_honor_commands.id]
         self.staff_honor_logging_channel = utils.get(self.guild.text_channels, name="🏅honor-logging")
         self.skybies = self.client.get_cog("Skybies")
         self.honor_threshold_roles = {

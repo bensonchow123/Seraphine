@@ -153,7 +153,7 @@ class HelpCommand(commands.Cog):
             inline=False,
         ).add_field(
             name="!Honor",
-            value="Gives a honor point to a user\n```!honor (@user / user id / user#0000)",
+            value="Gives a honor point to a user\n```!honor (@user / user id / user#0000)```",
             inline=False,
         ).add_field(
             name="!Honor leaderboard",

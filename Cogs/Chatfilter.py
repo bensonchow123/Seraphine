@@ -1,6 +1,6 @@
 import asyncio
 import os
-from re import search
+from re import search, findall
 
 import nextcord
 from nextcord.ext import commands
@@ -41,11 +41,9 @@ class ChatFilter(commands.Cog):
 
         await asyncio.gather(
             self.newline_filter(message),
-            self.advert_filter(message),
             self.attachment_filter(message),
             self.bot_channel_filter(message),
-            self.mention_filter(message),
-            self.link_filter(message),
+            self.discord_filter(message),
             self.ai_chat_filter(message),
         )
 
@@ -65,23 +63,6 @@ class ChatFilter(commands.Cog):
             self.send_logging_message(message, "Too many lines in message"),
             message.delete(),
         )
-
-    async def advert_filter(self, message: nextcord.Message):
-        if message.channel.permissions_for(message.author).manage_messages:
-            return
-
-        if "https://discord.gg/" in message.content.lower():
-            if message.channel.id != self.self_promotion_channel.id:
-                await asyncio.gather(
-                    message.channel.send(
-                        f"{message.author.mention} advertising is only allowed in {self.self_promotion_channel.mention}",
-                        delete_after=10,
-                    ),
-                    self.send_logging_message(
-                        message, "Advertising in non advertising channels"
-                    ),
-                    message.delete(),
-                )
 
     async def attachment_filter(self, message):
         if not message.attachments:
@@ -109,7 +90,7 @@ class ChatFilter(commands.Cog):
                             description=f"Your file, {attachment.filename}'s file type is not whitelisted",
                             color=0xCC2222,
                         ).set_footer(
-                            text="Contact MetallicWeb7080 for whitelisting your file's file type"
+                            text="Contact Hypicksell for whitelisting your file's file type"
                         )
                     ),
                     self.send_logging_message(
@@ -118,40 +99,41 @@ class ChatFilter(commands.Cog):
                     message.delete(),
                 )
 
-    async def mention_filter(self, message: nextcord.message):
-        if message.channel.permissions_for(message.author).administrator:
-            return
-        if "@everyone" not in message.content and "@here" not in message.content:
-            return
-        await asyncio.gather(
-            message.channel.send(
-                f"{message.author.mention} please don't mention everyone, your message has been deleted.",
-                delete_after=10,
-            ),
-            self.send_logging_message(
-                message, "Message contains mass mentions"
-            ),
-            message.delete(),
-        )
-
-    async def link_filter(self, message: nextcord.Message):
-        if message.channel.permissions_for(message.author).administrator:
+    async def discord_filter(self, message: nextcord.Message):
+        other_discord_links_allowed = [self.self_promotion_channel.id]
+        if message.channel.permissions_for(message.author).manage_messages:
             return
 
-        if "https://discord.gg/" in message.content.lower():
+        if message.channel.id in other_discord_links_allowed:
             return
 
-        url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-] [.][a-z]{2,4}/)(?:[^\s()<>] |\(([^\s()<>] |(\([^\s()<>] \)))*\)) (?:\(([^\s()<>] |(\([^\s()<>] \)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-        links_allowed = [867479726116438057, 850033574723584041, 850027624361230336]
-        if message.channel.id not in links_allowed and search(
-            url_regex, message.content
-        ):
-            await asyncio.gather(
-                message.channel.send(
-                    "You can only send links in <#867479726116438057>", delete_after=10
-                ),
-                self.send_logging_message(message, "Message contains links"),
-                message.delete(),
+        invites = findall(r"discord.gg/[a-z0-9]{8,}", message.content.casefold())
+        if invites:
+            our_invites = {
+                invite.code.casefold() for invite in await message.guild.invites()
+            }
+            for invite in invites:
+                *_, invite_code = invite.split("/")
+                if invite_code not in our_invites:
+                    break
+            else:
+                return
+            try:
+                await message.reply(
+                    embed=nextcord.Embed(
+                        description=(
+                            f"❌ {message.author.mention} you are not allowed to share Discord invites in this channel."
+                        ),
+                        color=0xAA0000,
+                    ),
+                    mention_author=True,
+                )
+            finally:
+                await message.delete()
+            await self.send_logging_message(
+                message,
+                reason=f"{message.author} sent {len(invites)} Discord invite{'s' if len(invites) > 1 else ''} in "
+                       f"{message.channel.mention}."
             )
 
     async def ai_chat_filter(self, message: nextcord.Message):

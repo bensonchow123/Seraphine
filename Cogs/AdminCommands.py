@@ -157,6 +157,7 @@ class AdminCommands(commands.Cog):
             await member.edit(timeout=None)
         elif self.muted_role in member.roles:
             await member.remove_roles(self.muted_role)
+            await member.add_roles(self.member_role)
         else:
             await ctx.send(f"{member.mention} is not muted")
             return
@@ -246,6 +247,7 @@ class AdminCommands(commands.Cog):
     async def on_ready(self):
         self.guild = self.client.get_guild(844231449014960160)
         self.muted_role = utils.get(self.guild.roles, name="Muted")
+        self.member_role = utils.get(self.guild.roles, name="Member")
         self.staff_logs_channel = utils.get(self.guild.text_channels, name="❗staff-logs")
         self.skybies = self.client.get_cog("Skybies")
 

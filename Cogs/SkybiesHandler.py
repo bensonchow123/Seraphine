@@ -2,15 +2,16 @@ import os
 from datetime import datetime, timedelta, timezone
 from random import uniform
 
-from nextcord import utils, Embed, Colour, Member
 from dotenv import load_dotenv
-from nextcord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
+from nextcord import utils, Embed, Colour, Member
+from nextcord.ext import commands
 
 load_dotenv()
 cluster = AsyncIOMotorClient(os.getenv("MongoDbSecretKey"))
 skybiedb = cluster["Skyhub"]["Skybies"]
 giftcards_db = cluster["Skyhub"]["Giftcards"]
+
 
 class Skybies(commands.Cog):
     def __init__(self, client):
@@ -46,7 +47,8 @@ class Skybies(commands.Cog):
             new_skybies_count = stats["skybies"] + count
             await skybiedb.update_one({"member_id": member.id}, {"$set": {"skybies": new_skybies_count}})
             new_lifetime_skybies_count = stats["lifetime_skybies"] + count
-            await skybiedb.update_one({"member_id": member.id}, {"$set": {"lifetime_skybies": new_lifetime_skybies_count}})
+            await skybiedb.update_one({"member_id": member.id},
+                                      {"$set": {"lifetime_skybies": new_lifetime_skybies_count}})
 
     async def _take_skybies(self, member, count, reason=None):
         if reason:
@@ -102,24 +104,24 @@ class Skybies(commands.Cog):
             f"<t:{int(next_day.replace(tzinfo=timezone.utc).timestamp())}:t>. That's in approximately {thats_in_msg}.*")
 
         skybies, lifetime_skybies = await self._get_skybies(lookup_member)
-        skybies_embed = Embed(
+        skybies_stats_embed = Embed(
             title="Skybies stats",
             description=f"{lookup_member.mention} have {lifetime_skybies} lifetime skybies and {skybies} skybies",
             colour=0x007bff
         )
-        skybies_embed.add_field(
+        skybies_stats_embed.add_field(
             name="Activity Streak",
             value=streak
         )
         if self.angel in lookup_member.roles:
-            skybies_embed.add_field(
+            skybies_stats_embed.add_field(
                 name="Skybies role purchases",
                 value=f"Roles that {you.lower()} have purchased 😊\n"
                       f"{'Thanks for supporting the server!!!' if self_lookup else 'Learn more skybies purchases in `!skybies shop`'}",
                 inline=False
             )
         if self.master_of_disguise in lookup_member.roles:
-            skybies_embed.add_field(
+            skybies_stats_embed.add_field(
                 name="🥸 Master of disguise 🥸",
                 value=(
                     "*30 skybies to purchase*\n"
@@ -129,7 +131,7 @@ class Skybies(commands.Cog):
                 inline=False
             )
         if self.sky_promoter in lookup_member.roles:
-            skybies_embed.add_field(
+            skybies_stats_embed.add_field(
                 name="📢 Sky Promoter 📢",
                 value=(
                     "*50 Skybies to purchase*\n"
@@ -139,7 +141,7 @@ class Skybies(commands.Cog):
                 inline=False
             )
         if self.angel in lookup_member.roles:
-            skybies_embed.add_field(
+            skybies_stats_embed.add_field(
                 name="😎 Angels 😎",
                 value=(
                     "*70 Skybies to purchase*\n"
@@ -149,9 +151,10 @@ class Skybies(commands.Cog):
                 inline=False
             )
 
-        skybies_embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/669941420454576131.png?v=1")
-        skybies_embed.set_footer(text="!skybie | !skybie @user | !skybie leaderboard | !skybie shop | !help skybies")
-        return skybies_embed
+        skybies_stats_embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/669941420454576131.png?v=1")
+        skybies_stats_embed.set_footer(
+            text="!skybie | !skybie @user | !skybie leaderboard | !skybie shop | !help skybies")
+        return skybies_stats_embed
 
     async def _leaderboard_embed(self, requester):
         rankings = await self._get_top_skybies()
@@ -178,18 +181,24 @@ class Skybies(commands.Cog):
             leaderboard_list.append("...")
             leaderboard_list.append(f"**{rank}.You have {skybies_count} lifetime skybies**")
 
-        leaderboard_embed = Embed(title="Skybies Leaderboard", description="\n".join(leaderboard_list), colour=0x007bff)
-        leaderboard_embed.set_thumbnail(url="https://cdn.discordapp.com/emojis/669941420454576131.png?v=1")
-        leaderboard_embed.set_footer(text="!skybie | !skybie @user | !skybie leaderboard | !skybie shop | !help skybies")
-        return leaderboard_embed
+        skybies_leaderboard_embed = Embed(
+            title="Skybies Leaderboard",
+            description="\n".join(leaderboard_list),
+            colour=0x007bff
+        ).set_thumbnail(
+            url="https://cdn.discordapp.com/emojis/669941420454576131.png?v=1"
+        ).set_footer(
+            text="!skybie | !skybie @user | !skybie leaderboard | !skybie shop | !help skybies"
+        )
+        return skybies_leaderboard_embed
 
     async def _skybies_shop_embed(self):
         skybies_shop_embed = Embed(
-            title= "Skybies shop",
+            title="Skybies shop",
             description=(
-            "🤩 You can purchase items with skybies 🤩\n"
-            "Don't worry for your skybies leaderboard positon, as your lifetime skybies won't be deducted.\n"
-            "Currently I only sells 4 items, which is explained below!"
+                "🤩 You can purchase items with skybies 🤩\n"
+                "Don't worry for your skybies leaderboard positon, as your lifetime skybies won't be deducted.\n"
+                "Currently I only sells 5 items, which is explained below!"
             ),
             colour=0x007bff
         ).add_field(
@@ -204,7 +213,7 @@ class Skybies(commands.Cog):
         ).add_field(
             name="Greater giftcard",
             value=(
-                "For 40 skybies, I will sell you an giftcard that contains 0m to 3m skyblock coins\n"
+                "For 40 skybies, I will sell you an giftcard that contains 500k to 2m skyblock coins\n"
                 f"Open a ticket in {self.ticket_channel.mention} to claim your coins\n"
                 "Purchase it with:\n"
                 "`!skybies shop greater_giftcard`"
@@ -236,14 +245,14 @@ class Skybies(commands.Cog):
                 f"be displayed separately from other members\n"
                 f"Purchase it with:\n"
                 f"`!skybies shop angel`"
-                ),
+            ),
             inline=False
         )
         return skybies_shop_embed
 
-    async def _purchase_status_embed(self, reason, status):
-        colour = 0x4bb543 if status == "successful" else 0xff0033
-        end_of_title = "successful!" if status == "successful" else "unsuccessful :("
+    async def _purchase_status_embed(self, reason, successful):
+        colour = 0x4bb543 if successful else 0xff0033
+        end_of_title = "successful!" if successful else "unsuccessful :("
         purchase_status_embed = Embed(
             title=f"Your item purchase is {end_of_title}",
             description=reason,
@@ -254,8 +263,8 @@ class Skybies(commands.Cog):
         return purchase_status_embed
 
     async def _roll_sb_coins(self, type):
-        upper_bound = 3.0 if type == "greater" else 1.0
-        lower_bound = 0.0 if type == "greater" else 0.0
+        upper_bound = 2 if type == "greater" else 1.0
+        lower_bound = 0.5 if type == "greater" else 0.0
         return round(uniform(lower_bound, upper_bound), 2)
 
     async def _giftcards_generator(self, member, type):
@@ -268,21 +277,21 @@ class Skybies(commands.Cog):
         skybie_cost = self.item_cost[f"{type}_giftcard"]
         skybies_aquired, _ = await self._get_skybies(ctx.author)
         if (skybies_aquired - skybie_cost) < 0:
-            purchase_description =(
+            purchase_description = (
                 f"You cannot afford a {type} giftcard, you only have {skybies_aquired} skybies,\n"
                 f"You need {skybie_cost} skybies to purchase a {type} giftcard"
             )
-            status = "unsuccessful"
+            successful = False
         else:
             await self._take_skybies(ctx.author, skybie_cost, f"{ctx.author.mention} brought a {type} giftcard!")
             coins = await self._giftcards_generator(ctx.author, type)
             purchase_description = (
-                    f"You have purchased a {type} giftcard, it contains **{coins}m** sb coins\n"
-                    f"You have {skybies_aquired - skybie_cost} skybies left, do !giftcard to check your unredeemed giftcards\n"
-                    f"Open a ticket at {self.ticket_channel.mention} to redeem your giftcards"
+                f"You have purchased a {type} giftcard, it contains **{coins}m** sb coins\n"
+                f"You have {skybies_aquired - skybie_cost} skybies left, do !giftcard to check your unredeemed giftcards\n"
+                f"Open a ticket at {self.ticket_channel.mention} to redeem your giftcards"
             )
-            status = "successful"
-        purchase_embed = await self._purchase_status_embed(purchase_description, status)
+            successful = True
+        purchase_embed = await self._purchase_status_embed(purchase_description, successful)
         await ctx.send(embed=purchase_embed)
 
     async def _has_role(self, ctx, role):
@@ -315,13 +324,13 @@ class Skybies(commands.Cog):
             purchase_description = (
                 f"You already have the {role.mention} role, why do you want to buy it again?"
             )
-            status = "unsuccessful"
+            successful = False
         elif (skybies_aquired - skybie_cost) < 0:
             purchase_description = (
                 f"You cannot afford the {role.mention} role, you only have {skybies_aquired} skybies"
                 f"You need {skybie_cost} to purchase the {role.mention} role"
             )
-            status = "unsuccessful"
+            successful = False
         else:
             await self._take_skybies(ctx.author, skybie_cost, f"{ctx.author.mention} brought the {role.mention} role")
             await ctx.author.add_roles(role)
@@ -329,60 +338,25 @@ class Skybies(commands.Cog):
                 f"You have purchased the {role.mention} role, {privilege}\n"
                 f"You now have {skybies_aquired - skybie_cost} skybies left"
             )
-            status = "successful"
-        purchase_embed = await self._purchase_status_embed(purchase_description, status)
+            successful = True
+        purchase_embed = await self._purchase_status_embed(purchase_description, successful)
         await ctx.send(embed=purchase_embed)
 
-    @commands.cooldown(1, 1, commands.BucketType.user)
-    @commands.command(aliases=["skybie", "s"])
-    async def skybies(self, ctx, option=None, item=None):
-        if ctx.channel.id != self.bot_channel.id and not ctx.author.guild_permissions.administrator:
-            await ctx.send(f"Use this command in the {self.bot_channel.mention} channel", delete_after=10)
+    @commands.group(aliases=["skybie", "s"], invoke_without_command=True)
+    async def skybies(self, ctx, member: Member = None):
+        if ctx.invoked_subcommand is None:
+            if ctx.channel.id != self.seraphine_commands.id and not ctx.author.guild_permissions.administrator:
+                await ctx.send(f"Use this command in the {self.seraphine_commands.mention} channel", delete_after=10)
 
-        elif not option:
-            await ctx.send(embed=await self._skybies_stats_embed(ctx.author, True))
+            if not member:
+                member = ctx.author
+            await ctx.send(embed=await self._skybies_stats_embed(member, True))
 
-        elif option.casefold().startswith("<@"):
-            await ctx.send(embed=await self._skybies_stats_embed(ctx.message.mentions[0], False))
-
-        elif option.casefold() in {
-            "leaderboard",
-            "lb",
-            "l",
-        }:
-            leaderboard_embed = await self._leaderboard_embed(ctx.author)
-            await ctx.send(embed=leaderboard_embed)
-
-        elif option.casefold() in {
-            "shop",
-            "store"
-            "s"
-        }:
-            if not item:
-                skybie_shop_embed = await self._skybies_shop_embed()
-                await ctx.send(embed=skybie_shop_embed)
-
-            if item and item not in self.item_cost:
-                item_do_not_exist_embed = await self._purchase_status_embed(
-                    reason=(
-                        "I don't sell the item you are requesting,\n"
-                        "Do `!skybies shop` to see what items you can purchase from me"
-                    ),
-                    status="unsuccessful"
-                )
-                await ctx.send(embed=item_do_not_exist_embed)
-
-            if item and item in self.item_cost:
-                item = item.casefold().strip()
-                if "giftcard" in item:
-                    type = item.split("_")[0]
-                    if type == "lesser" or type == "greater":
-                        await self._giftcard_handler(ctx, type)
-                if "angel" in item or "sky_promoter" in item or "master_of_disguise" in item:
-                    await self._role_purchase_handler(ctx, item)
-        else:
+    @skybies.error
+    async def skybies_error(self, ctx, error):
+        if isinstance(error, commands.MemberNotFound):
             option_not_exist_embed = Embed(
-                title="This skybie command don't exist",
+                title="Skybie command or member don't exist",
                 description="Do `!help skybie` to get a list of skybie commands",
                 colour=0xff0033
             ).set_footer(
@@ -390,10 +364,50 @@ class Skybies(commands.Cog):
             )
             await ctx.send(embed=option_not_exist_embed)
 
-    @skybies.error
-    async def skybies_timeout(self, ctx, error):
+    @skybies.command(name="leaderboard", aliases=['l', 'lb'])
+    async def skybies_leaderboard(self, ctx):
+        if ctx.channel.id != self.seraphine_commands.id and not ctx.author.guild_permissions.administrator:
+            await ctx.send(f"Use this command in the {self.seraphine_commands.mention} channel", delete_after=10)
+        leaderboard_embed = await self._leaderboard_embed(ctx.author)
+        await ctx.send(embed=leaderboard_embed)
+
+    @commands.cooldown(1, 1, commands.BucketType.user)
+    @skybies.command(name="shop", aliases=['s', 'sh', 'store'])
+    async def skybies_shop(self, ctx, item=None):
+        if ctx.channel.id != self.seraphine_commands.id and not ctx.author.guild_permissions.administrator:
+            await ctx.send(f"Use this command in the {self.seraphine_commands.mention} channel", delete_after=10)
+        if not item:
+            skybie_shop_embed = await self._skybies_shop_embed()
+            await ctx.send(embed=skybie_shop_embed)
+
+        if item and item not in self.item_cost:
+            item_do_not_exist_embed = await self._purchase_status_embed(
+                reason=(
+                    "I don't sell the item you are requesting,\n"
+                    "Do `!skybies shop` to see what items you can purchase from me"
+                ),
+                successful=False
+            )
+            await ctx.send(embed=item_do_not_exist_embed)
+
+        if item and item in self.item_cost:
+            item = item.casefold().strip()
+            if "giftcard" in item:
+                type = item.split("_")[0]
+                if type == "lesser" or type == "greater":
+                    await self._giftcard_handler(ctx, type)
+            if "angel" in item or "sky_promoter" in item or "master_of_disguise" in item:
+                await self._role_purchase_handler(ctx, item)
+
+    @skybies_shop.error
+    async def skybie_shop_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.message.reply("Hey chill, you can only use this command every 1 second")
+            await ctx.send(
+                self._purchase_status_embed(
+                    reason="You are on cooldown, please wait 1 second before trying to purchase again",
+                    successful=False
+                )
+            )
 
     async def _giftcards_embed(self, giftcard_list):
         if giftcard_list:
@@ -428,8 +442,8 @@ class Skybies(commands.Cog):
 
     @commands.command(aliases=["giftcard"])
     async def giftcards(self, ctx, member: Member = None):
-        if ctx.channel.id != self.bot_channel.id and not ctx.author.guild_permissions.administrator:
-            await ctx.send(f"Use this command in the {self.bot_channel.mention} channel", delete_after=10)
+        if ctx.channel.id != self.seraphine_commands.id and not ctx.author.guild_permissions.administrator:
+            await ctx.send(f"Use this command in the {self.seraphine_commands.mention} channel", delete_after=10)
             return
 
         if not member:
@@ -492,7 +506,7 @@ class Skybies(commands.Cog):
         self.sky_promoter = utils.get(self.guild.roles, name="📢Sky Promoter📢")
         self.master_of_disguise = utils.get(self.guild.roles, name="🥸master of disguise🥸")
 
-        self.bot_channel = utils.get(self.guild.text_channels, name="👩seraphine-commands")
+        self.seraphine_commands = utils.get(self.guild.text_channels, name="👩seraphine-commands")
         self.ticket_channel = self.angel_channel = utils.get(self.guild.text_channels, name="🎫make-a-ticket")
         self.angel_channel = utils.get(self.guild.text_channels, name="😎angels-chat")
         self.skybies_logs_channel = utils.get(self.guild.text_channels, name="🌟skybies-logs")
