@@ -1,0 +1,150 @@
+{
+  "seraphine_questions": [
+    {
+      "description": "**Seraphine says:**\n||Who is the highest voted resistence leader during dante's reign?||\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Dante", "B. Technoblade", "C. Dante's goons", "D. Refraction"],
+      "footer": "Technoblade never dies!",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/3/38/Slime.png/revision/latest?cb=20210804004914",
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/0/0a/Dante.png/revision/latest?cb=20210414124834",
+      "answer": ["B"]
+    },
+    {
+      "description": "**Seraphone says:**\nWhat is a crop that grows infinity from one seed?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Wheat", "B. Water Mellon", "C. Sugarcane", "D. Pumpkin"],
+      "footer": "Seraphine says: What is the crop that can grow up to three blocks?",
+      "thumbnail_url": "https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/75/Wheat_JE2_BE2.png/revision/latest?cb=20190521034232",
+      "image_url": null,
+      "answer": ["C"]
+    },
+    {
+      "description": "**Seraphone says:**\n||Type out the name of that npc below!||",
+      "fields": null,
+      "footer": "TommyInnit came up with the idea of 'Aspect of the (npc name)'!",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/5/58/Villager.png/revision/latest?cb=20210805125409",
+      "answer": ["Jerry"]
+    },
+    {
+      "description": "**Seraphany says:**\nWhats is the name of the npc who host the dojo?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Master Toa", "B. Seraphine (me)", "C. Master Tao ", "D. Master Doa"],
+      "footer": "Seraphine says: Which npc work as a clerk in the community center?",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/8/8e/Master_Tao.png/revision/latest?cb=20220430120710",
+      "answer": ["B"]
+    },
+    {
+      "description": "**Seraphine says:**\nAn item has the lore: ```In the mist of chaos, there is also opportunity```What is the item?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Potato crown", "B. Basket of Hope from the Great Potato War", "C. Blood god crest", "D. The art of war"],
+      "footer": "He is but a puppet, and I the puppeteer; DANCE POTATO BOY DANCE!",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/c/c2/Potato.png/revision/latest?cb=20210615231202",
+      "image_url": null,
+      "answer": ["D"]
+    },
+    {
+      "description": "**Sepaphine says:**\nThere are 4 mining tools below, which one does not exist?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Gemstone gauntlet", "B. Pickonimbus 2000", "C. Divans drill", "D. Refined Titanium Pickaxe"],
+      "footer": "Seraphine says: Which of those mining tools above are the best?",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/d/d4/Enchanted_Iron_Pickaxe.png/revision/latest?cb=20210609010918",
+      "image_url": null,
+      "answer": ["C"]
+    },
+    {
+      "description": "**Seraphine says:**\n||What spawns once every 2 hours on the island below?||\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Ashfang", "B. Bladesoul", "C. Magma Cube Boss", "D. Magma Boss"],
+      "footer": "There is a disturbance, this island has disappeared...",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/6/67/Blazing_Fortress_%280.1%29.png/revision/latest?cb=20230115091635",
+      "answer": [
+        "C"
+      ]
+    },
+    {
+      "description": "**Seraphine says:**\nWhat item this poem is referring to?\n_(Answer with A, B, C, or D)_\n```A blocky worker in the sky,\nIt mines and mines until you're nigh.\nWith Krampus helm, it brings good cheer,\nDiamonds and presents, oh so dear.\n\nBut wait, there's more it has to give,\nMining exp for as long as you live.\nWith diamond spreading, yields increase,\nThis little worker, a mining masterpiece.```",
+      "fields": ["A. Wheat minion in hub", "B. Snow minion", "C. presents", "D. Ice minion"],
+      "footer": "Minions are not child labour, they 100% do it voluntarily!",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/3/30/Jerry%27s_Workshop.png/revision/latest?cb=20201014204353",
+      "answer": ["B"]
+    },
+    {
+      "description": "**Seraphine says:**\n||Is bert an npc on hypixel?||\n_(answer with `yes` or `no`)_",
+      "fields": null,
+      "footer": "Bert the blacksmith?",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/b/b4/Villager_Blacksmith.png/revision/latest?cb=20210805125405",
+      "answer": ["no"]
+    },
+    {
+      "description": "**Seraphine says:**\n||Which admin is famous for giving out this item below?||",
+      "fields": null,
+      "footer": "A rare space helmet forged from shards of moon glass... You can get it from the spaceman npc too!",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/8/8e/Red_Stained_Glass.png/revision/latest?cb=20210616012843",
+      "answer": ["dctr", "LadyBleu"]
+    },
+    {
+      "description": "**Seraphine says:**\nHow do you obtain the golden ball reforge stone in hypixel?\n_(Answer with A, B, C, or D)_\n[The methods they tried to get the golden ball...](https://hypixel.net/threads/found-current-ideas-tested-on-cowshed.4230149/)",
+      "fields": ["A. Combining beach ball and gold ingot in anvil", "B. Shearing all sheep on farming island", "C. Speaking to treasure hunter 250 times", "D. Bring a sea emperor to jake"],
+      "footer": "The great hunt of the golden ball!",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/0/05/Golden_Ball.png/revision/latest?cb=20210512000823",
+      "answer": ["D"]
+    },
+    {
+      "description": "**Seraphine says:**\n||How often does dark auction happens||\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Every 1 hour", "B. Every 60 minutes", "C. Every 3 skyblock days", "D. Every 0.00806... sb year"],
+      "footer": "C418 - Stal was the name of the song played in the dark auction!",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/2/27/Dark_Auction.png/revision/latest?cb=20200515165811",
+      "image_url": null,
+      "answer": ["A","B","C", "D"]
+    },
+    {
+      "description": "**Serapinou says:**\nSome pets uses special items to tier them up to mythic, which item below is fake?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Jerry 3D Glasses", "B. Vampire Fang", "C. Radioactive Vial", "D. Enderman Cortex Rewriter"],
+      "footer": "Seraphine says: Which item is used on Jerry?",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/c/c1/Jerry_3D_Glasses.png/revision/latest?cb=20210111225608",
+      "image_url": null,
+      "answer": ["A"]
+    },
+    {
+      "description": "**Seraphine says:**\nWhat didn't happen to the 7 shiny relics used to power the Blood God Shrine?\n_(Answer with A, B, C, or D)_",
+      "fields": ["A. Stored in an ender chest", "B. Thrown in lava", "C. Wiped due to duper purchasing them", "D. In an inactive player's inventory"],
+      "footer": "4 of the shiny relics are wiped due to the same duper...",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/0/01/Shiny_Relic.png/revision/latest?cb=20210418043932",
+      "image_url": null,
+      "answer": ["B"]
+    },
+    {
+      "description": "||How much HP does bal have||?",
+      "fields": ["A. 200 HP", "B. 200k HP", "C. 2m HP", "D. 20m HP"],
+      "footer": "The ground starts to shake and the lava bubbles...",
+      "thumbnail_url": null,
+      "image_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/e/ed/Magma_Cube.png/revision/latest?cb=20210705161900",
+      "answer": ["A"]
+    },
+    {
+      "description": "**Seraphine says:**\nIn spooky festival, green candy gives one point in the leaderboard,\nHow many points do you get for every purple candy?",
+      "fields": ["A. 2 points ", "B. 3 points", "C. 5 points", "D. 10 points"],
+      "footer": "During Halloween irl, additional Spooky Festival are organised!",
+      "thumbnail_url": "https://wiki.hypixel.net/images/6/62/SkyBlock_items_purple_candy.png",
+      "image_url": "https://wiki.hypixel.net/images/1/16/SkyBlock_renders_event_spooky.png",
+      "answer": ["C"]
+    },
+    {
+      "description": "**Seraphine says:**\nWhat fact below is false about the stock of stonks?",
+      "fields": ["A. Sold for 200 coins for one day", "B. Used to test the bazzar", "C. The npc who sell it is still in the game", "D. It was intended to be valueless"],
+      "footer": "stonk of stonks to the moon!",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/b/b2/Paper.png/revision/latest?cb=20210615230953",
+      "image_url": null,
+      "answer": ["C"]
+    },
+    {
+      "description": "**Serapapa says:**\nWhat item below is the rarest from the reward chest of infernal tier Kuddra?",
+      "fields": ["A. Enrager", "B. Tentacle Dye", "C. A god roll aurora piece", "D. Infernal Kuudra Core"],
+      "footer": "Searphine says: What instead is the most common from above?",
+      "thumbnail_url": "https://static.wikia.nocookie.net/hypixel-skyblock/images/0/06/Kuudra.png/revision/latest?cb=20221026111601",
+      "image_url": null,
+      "answer": ["D"]
+    }
+  ]
+}
