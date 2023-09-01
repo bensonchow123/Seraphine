@@ -17,7 +17,7 @@ load_dotenv()
 cluster = AsyncIOMotorClient(getenv("MongoDbSecretKey"))
 db = cluster["Skyhub"]
 verification_db = db["Verification"]
-previous_roles_db = db["Skyhub"]["PreviousRoles"]
+previous_roles_db = db["PreviousRoles"]
 
 
 async def check_and_add_previous_roles(member):

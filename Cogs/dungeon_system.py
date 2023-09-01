@@ -534,7 +534,6 @@ class DungeonSystem(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def remove_old_tickets(self):
-        print("Checking for old tickets...")
         guild = self.client.get_guild(int(getenv("GUILD_ID")))
         for channel in guild.text_channels:
             if channel.category.name == "Carrying Tickets":
