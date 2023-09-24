@@ -87,6 +87,7 @@ class FunCommands(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.lol_counts = {}
+        self.voice_channel_times = {}
 
     @property
     def guild(self):

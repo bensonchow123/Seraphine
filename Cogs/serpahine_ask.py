@@ -181,7 +181,15 @@ class SeraphineAsk(commands.Cog):
             )
             return
 
-        if message.content.lower().strip() in [x.lower() for x in self.answer]:
+        if message.author.id in self.gave_incorrect_answer.keys() and self.gave_incorrect_answer[
+            message.author.id] >= 2:
+            await message.reply(
+                embed=Embed(description="🛑You ran out of attempts, you can't answer anymore", color=0xff0033),
+                delete_after=3
+            )
+            await message.delete()
+
+        elif message.content.lower().strip() in [x.lower() for x in self.answer]:
             self.on_cooldown = True
             self.answered_correctly = True
             await self.handle_answered_correctly(message)

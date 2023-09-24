@@ -19,7 +19,7 @@ charset-normalizer==2.0.9
 chat-exporter==2.5.1
 click==8.0.3
 colorama==0.4.4
-discord.py==2.3.1
+discord.py==2.3.2
 dnspython==2.2.1
 docutils==0.19
 emoji==2.2.0
